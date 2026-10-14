@@ -14,6 +14,7 @@ import {
 
 export type ScreenId =
   | 'dashboard'
+  | 'sourcing'
   | 'products'
   | 'register'
   | 'carousel'
@@ -40,6 +41,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
       id: 'dashboard',
       label: '대시보드',
       icon: <LayoutDashboard className="w-4 h-4" />,
+    },
+    {
+      id: 'sourcing',
+      label: '키워드 발굴 (DataLab)',
+      icon: <TrendingUp className="w-4 h-4" />,
     },
     {
       id: 'products',

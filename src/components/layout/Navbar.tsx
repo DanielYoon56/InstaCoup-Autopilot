@@ -20,6 +20,8 @@ export const Navbar: React.FC<NavbarProps> = ({
     switch (screen) {
       case 'dashboard':
         return '통합 운영 대시보드';
+      case 'sourcing':
+        return '트렌드 키워드 소싱 (Naver DataLab · ItemScout)';
       case 'products':
         return '상품 목록 및 평가 분석';
       case 'register':

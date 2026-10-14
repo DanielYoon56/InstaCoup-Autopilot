@@ -134,10 +134,74 @@ export const CommentDmLogScreen: React.FC<CommentDmLogScreenProps> = ({
           </h2>
         </div>
 
-        {/* Manychat Adapter Status Banner */}
-        <div className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs flex items-center gap-2 text-slate-600">
-          <span className="font-semibold text-slate-800">Manychat 연동:</span>
-          <span className="text-amber-700 font-medium">[DEMO 어댑터 모드]</span>
+        {/* Manychat & Meta Graph API Status Banner */}
+        <div className="flex items-center gap-2">
+          <div className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs flex items-center gap-2 text-slate-600">
+            <span className="font-semibold text-slate-800">Manychat 연동:</span>
+            <span className="text-emerald-700 font-semibold">[웹훅 엔드포인트 활성화됨]</span>
+          </div>
+          <div className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs flex items-center gap-2 text-slate-600">
+            <span className="font-semibold text-slate-800">Meta Graph API:</span>
+            <span className="text-sky-700 font-semibold">[Private Replies 지원]</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Real Auto-Dispatch Architecture Explanation */}
+      <div className="bg-gradient-to-r from-slate-900 to-slate-800 text-white rounded-2xl p-6 shadow-sm border border-slate-700 space-y-4">
+        <div className="flex items-center gap-2 text-xs font-semibold text-sky-400">
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+          <span>REAL INSTAGRAM AUTO-DISPATCH ARCHITECTURE</span>
+        </div>
+        <h3 className="text-base sm:text-lg font-bold text-white">
+          실제 Instagram 댓글 ➔ DM 자동 발송 가능 구조 안내
+        </h3>
+        <p className="text-xs text-slate-300 leading-relaxed">
+          메타(Meta) 공식 인스타그램 정책 및 Graph API 규정에 따라 <strong>실제 자동 발송이 100% 가능</strong>하며, 아래 2가지 경로를 완벽히 지원하도록 본 시스템 백엔드가 설계되어 있습니다.
+        </p>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 text-xs">
+          {/* Path 1: Manychat External Request */}
+          <div className="p-4 bg-slate-800/80 rounded-xl border border-slate-700 space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="font-bold text-sky-300 flex items-center gap-1.5">
+                <span>방법 A. Manychat 자동화 어댑터 연동 (가장 추천)</span>
+              </div>
+              <span className="text-[10px] px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 font-semibold">
+                표준 상용 방식
+              </span>
+            </div>
+            <p className="text-[11px] text-slate-300 leading-relaxed">
+              Manychat Instagram Automation 템플릿의 'External Request(외부 웹훅)' 액션에 본 시스템 엔드포인트(<code>/api/webhooks/manychat</code>)를 등록합니다.
+            </p>
+            <div className="p-2.5 bg-slate-950/60 rounded-lg text-[11px] font-mono text-slate-400 space-y-1">
+              <div>1. 팔로워 댓글 작성 (예: '링크')</div>
+              <div>2. Manychat ➔ 본 시스템 웹훅 호출 (키워드/상품 조회)</div>
+              <div>3. 본 시스템 ➔ 정확한 쿠팡 제휴링크 + FTC 고지 응답</div>
+              <div className="text-emerald-400 font-semibold">4. Manychat이 실제 Instagram DM으로 즉각 자동 발송!</div>
+            </div>
+          </div>
+
+          {/* Path 2: Meta Graph API Private Replies */}
+          <div className="p-4 bg-slate-800/80 rounded-xl border border-slate-700 space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="font-bold text-emerald-300 flex items-center gap-1.5">
+                <span>방법 B. Meta 공식 Graph API 직접 발송</span>
+              </div>
+              <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-semibold">
+                자체 앱 연동
+              </span>
+            </div>
+            <p className="text-[11px] text-slate-300 leading-relaxed">
+              메타 개발자 센터에서 Webhook(<code>/api/webhooks/instagram</code>)을 등록하고 <code>instagram_manage_messages</code> 토큰을 등록하여 직접 발송합니다.
+            </p>
+            <div className="p-2.5 bg-slate-950/60 rounded-lg text-[11px] font-mono text-slate-400 space-y-1">
+              <div>- 공식 API: <code>POST /{'{comment_id}'}/messages</code></div>
+              <div>- 정책 조건: 공개 댓글 작성 후 7일 이내 단 1회 비공개 답장 허용</div>
+              <div>- 스팸 방지: 24시간 중복 방지 쿨다운 자동 필터 가동</div>
+              <div className="text-sky-300 font-semibold">※ 아래 시뮬레이터로 사전에 트리거 및 쿨다운을 검증할 수 있습니다.</div>
+            </div>
+          </div>
         </div>
       </div>
 

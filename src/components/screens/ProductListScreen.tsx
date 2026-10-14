@@ -22,6 +22,7 @@ interface ProductListScreenProps {
   onGeneratePostForProduct: (product: Product) => void;
   onUpdateProduct: (product: Product) => void;
   onDeleteProduct: (id: string) => void;
+  onNavigateToSourcing?: () => void;
 }
 
 export const ProductListScreen: React.FC<ProductListScreenProps> = ({
@@ -30,6 +31,7 @@ export const ProductListScreen: React.FC<ProductListScreenProps> = ({
   onGeneratePostForProduct,
   onUpdateProduct,
   onDeleteProduct,
+  onNavigateToSourcing,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
@@ -80,13 +82,24 @@ export const ProductListScreen: React.FC<ProductListScreenProps> = ({
           </p>
         </div>
 
-        <button
-          onClick={onOpenRegisterModal}
-          className="px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white font-semibold text-xs rounded-lg transition-colors flex items-center gap-1.5 shrink-0 shadow-xs"
-        >
-          <Plus className="w-4 h-4" />
-          <span>상품 신규 등록</span>
-        </button>
+        <div className="flex items-center gap-2 shrink-0">
+          {onNavigateToSourcing && (
+            <button
+              onClick={onNavigateToSourcing}
+              className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-lg transition-colors flex items-center gap-1.5 shadow-xs"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-sky-400" />
+              <span>DataLab 키워드 소싱에서 발굴</span>
+            </button>
+          )}
+          <button
+            onClick={onOpenRegisterModal}
+            className="px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white font-semibold text-xs rounded-lg transition-colors flex items-center gap-1.5 shadow-xs"
+          >
+            <Plus className="w-4 h-4" />
+            <span>상품 직접 등록</span>
+          </button>
+        </div>
       </div>
 
       {/* Filters Bar */}

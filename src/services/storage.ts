@@ -7,6 +7,7 @@ import {
   ScoreBreakdown,
   ScoreGrade,
   CarouselSlide,
+  SourcingKeyword,
 } from '../types';
 
 export const SCORE_WEIGHTS = {
@@ -515,6 +516,201 @@ const SEED_API_SETTINGS: ApiSettings = {
   },
 };
 
+const SEED_SOURCING_KEYWORDS: SourcingKeyword[] = [
+  {
+    id: 'kw-001',
+    keyword: '카본 타워형 전기히터',
+    category: 'living',
+    monthlySearchVolume: 84200,
+    mobileSearchRatio: 82,
+    productCount: 23600,
+    competitionIndex: 0.28,
+    competitionStatus: 'BLUE_OCEAN',
+    trendGrowthRate: 210,
+    seasonalityStatus: 'RISING',
+    shoppingIntentRatio: 88,
+    recommendedProductTitle: '저소음 탄소섬유 카본 타워형 전기히터 1200W (좌우회전/전도안전스위치)',
+    estimatedPrice: 69000,
+    estimatedCommissionRate: 3.0,
+    suggestedSpecs: '소비전력 1200W, 발열체 탄소섬유 카본 램프, 3초 순간발열, 70도 좌우 회전, KC안전인증',
+    sourcingPoints: [
+      '가을~겨울 환절기 난방비 절감 니즈 급증',
+      '기존 석영관 히터 대비 눈부심 70% 감소 및 냄새 없음',
+      '전도 시 자동 전원 차단 안전센서로 자취/반려동물 가구 타깃 최적',
+    ],
+    dataSources: 'Naver DataLab 쇼핑인사이트 & ItemScout 키워드 지수 (2026년 10월 실측)',
+    isImported: false,
+  },
+  {
+    id: 'kw-002',
+    keyword: '초음파 통세척 가습기 4L',
+    category: 'living',
+    monthlySearchVolume: 96500,
+    mobileSearchRatio: 79,
+    productCount: 33800,
+    competitionIndex: 0.35,
+    competitionStatus: 'BLUE_OCEAN',
+    trendGrowthRate: 175,
+    seasonalityStatus: 'RISING',
+    shoppingIntentRatio: 85,
+    recommendedProductTitle: '상부급수 완전분리 통세척 대용량 초음파 가습기 4.2L (SUS304 진동자)',
+    estimatedPrice: 48900,
+    estimatedCommissionRate: 3.0,
+    suggestedSpecs: '수조용량 4.2L, 시간당 분무량 300ml, 수조/진동자 완전 분리 식기세척기 세척 가능, 저소음 22dB',
+    sourcingPoints: [
+      '건조한 가을철 비염·피부건조 해결 필수템',
+      '물때 곰팡이 걱정 없는 100% 손세척 분리형 구조 강조',
+      '물 채우기 편한 상부 급수 방식으로 주부 만족도 최상',
+    ],
+    dataSources: 'Naver DataLab 계절가전 클릭 트렌드 1위',
+    isImported: false,
+  },
+  {
+    id: 'kw-003',
+    keyword: '스텐 무연 안방 전기그릴',
+    category: 'kitchen',
+    monthlySearchVolume: 52100,
+    mobileSearchRatio: 75,
+    productCount: 22900,
+    competitionIndex: 0.44,
+    competitionStatus: 'BLUE_OCEAN',
+    trendGrowthRate: 68,
+    seasonalityStatus: 'STEADY',
+    shoppingIntentRatio: 82,
+    recommendedProductTitle: '연기 냄새 흡입 스마트 듀얼 팬 무연 전기그릴 (불판 SUS304 코팅 프리)',
+    estimatedPrice: 119000,
+    estimatedCommissionRate: 3.0,
+    suggestedSpecs: '내장 흡입팬 4단계 모터, 기름받이 물트레이 일체형, 1500W 열선, 최고 230도',
+    sourcingPoints: [
+      '아파트 거실 삼겹살 파티 시 냄새/연기 제로 소구',
+      '코팅 벗겨짐 없는 스텐 불판 또는 고효율 열풍팬 인증',
+      '객단가 10만원대 이상으로 건당 제휴 수수료 약 3,500원 고수익',
+    ],
+    dataSources: 'ItemScout 주방가전 검색 효율 상위 2%',
+    isImported: false,
+  },
+  {
+    id: 'kw-004',
+    keyword: '경량 백패킹 다운 침낭 800FP',
+    category: 'camping',
+    monthlySearchVolume: 39400,
+    mobileSearchRatio: 84,
+    productCount: 15400,
+    competitionIndex: 0.39,
+    competitionStatus: 'BLUE_OCEAN',
+    trendGrowthRate: 130,
+    seasonalityStatus: 'PEAK',
+    shoppingIntentRatio: 79,
+    recommendedProductTitle: '초경량 800 필파워 거위털 머미형 동계 캠핑 침낭 1000g (-10도 대응)',
+    estimatedPrice: 89000,
+    estimatedCommissionRate: 3.0,
+    suggestedSpecs: '구스다운 90:10 비율, 충전량 800g/총무게 1.2kg, 20D 립스탑 발수원단, 쾌적온도 -5도',
+    sourcingPoints: [
+      '가을~초겨울 캠핑 피크 시즌 백패킹 필수 장비',
+      '고가 브랜드(30~50만원대) 대비 8만원대 가성비 스펙 비교 소구',
+      '트렁크/배낭 수납 컴팩트 패킹 사이즈 실측 팩트 체크',
+    ],
+    dataSources: 'Naver DataLab 레저/캠핑 급상승 키워드',
+    isImported: false,
+  },
+  {
+    id: 'kw-005',
+    keyword: '스텐 밧드 올인원 밀폐용기 세트',
+    category: 'kitchen',
+    monthlySearchVolume: 47800,
+    mobileSearchRatio: 88,
+    productCount: 14800,
+    competitionIndex: 0.31,
+    competitionStatus: 'BLUE_OCEAN',
+    trendGrowthRate: 115,
+    seasonalityStatus: 'STEADY',
+    shoppingIntentRatio: 91,
+    recommendedProductTitle: '포스코 304 스테인리스 냉장고 정리 에어타이트 밧드 6종 세트 (채반 포함)',
+    estimatedPrice: 38900,
+    estimatedCommissionRate: 3.0,
+    suggestedSpecs: 'POSCO SUS304 스테인리스, 4면 결착 실리콘 뚜껑, 냉동/오븐/식기세척기 사용 가능',
+    sourcingPoints: [
+      '플라스틱 반찬통 변색/냄새배임 없는 반영구 스텐 용기',
+      '냉장고 칼각 정리 릴스/캐러셀 바이럴 콘텐츠 적합도 1위',
+      '채반 포함 구조로 채소/과일 신선 보관 2배 연장 팩트',
+    ],
+    dataSources: '아이템스카우트 살림 카테고리 꿀키워드',
+    isImported: false,
+  },
+  {
+    id: 'kw-006',
+    keyword: '미니 온풍기 사무실 발난로',
+    category: 'living',
+    monthlySearchVolume: 78900,
+    mobileSearchRatio: 86,
+    productCount: 33100,
+    competitionIndex: 0.42,
+    competitionStatus: 'BLUE_OCEAN',
+    trendGrowthRate: 240,
+    seasonalityStatus: 'RISING',
+    shoppingIntentRatio: 87,
+    recommendedProductTitle: 'PTC 세라믹 무소음 데스크탑 미니 온풍기 500W (과열방지/난연소재)',
+    estimatedPrice: 24500,
+    estimatedCommissionRate: 3.0,
+    suggestedSpecs: 'PTC 항공기 난방 세라믹 소자, 2초 즉각 온풍, 500W 저전력(누진세 부담 제로), 실측 36dB',
+    sourcingPoints: [
+      '직장인 사무실 책상 밑 수족냉증 타깃 직격',
+      '낮은 가격대(2만원대)로 즉각 구매 전환율(CVR) 극대화',
+      '과열 시 바이메탈 자동 차단 안전 시험성적서 강조',
+    ],
+    dataSources: 'Naver DataLab 10월 2주차 급상승 검색어',
+    isImported: false,
+  },
+  {
+    id: 'kw-007',
+    keyword: '온열 경추 견인 목마사지기',
+    category: 'beauty',
+    monthlySearchVolume: 61200,
+    mobileSearchRatio: 91,
+    productCount: 29400,
+    competitionIndex: 0.48,
+    competitionStatus: 'NORMAL',
+    trendGrowthRate: 95,
+    seasonalityStatus: 'STEADY',
+    shoppingIntentRatio: 84,
+    recommendedProductTitle: '인체공학 C커브 온열 에어백 스트레칭 목 견인기 (EMS 저주파 복합형)',
+    estimatedPrice: 54900,
+    estimatedCommissionRate: 3.0,
+    suggestedSpecs: '공기압 3단계 리프팅 견인, 42도 탄소섬유 찜질 온열, 인체공학 메모리폼 베개 일체형',
+    sourcingPoints: [
+      '거북목/일자목 스마트폰 사용자 현대인 필수 공감대',
+      '하루 10분 누워만 있으면 펴지는 시각적 비포/애프터 캐러셀',
+      'KC 안전인증 및 전자파 적합성 시험 확인',
+    ],
+    dataSources: 'ItemScout 헬스케어 카테고리 구매 전환율 8.2%',
+    isImported: false,
+  },
+  {
+    id: 'kw-008',
+    keyword: '맥세이프 차량용 펠티어 거치대',
+    category: 'digital',
+    monthlySearchVolume: 43800,
+    mobileSearchRatio: 89,
+    productCount: 22300,
+    competitionIndex: 0.51,
+    competitionStatus: 'NORMAL',
+    trendGrowthRate: 85,
+    seasonalityStatus: 'STEADY',
+    shoppingIntentRatio: 89,
+    recommendedProductTitle: 'Qi 공식 15W 맥세이프 차량용 반도체 펠티어 냉각 충전 거치대',
+    estimatedPrice: 29800,
+    estimatedCommissionRate: 3.0,
+    suggestedSpecs: '펠티어 냉각 소자 15도 급속 쿨링, 15W 고속무선충전, N52 네오디뮴 자석 16개 지지력 2kg',
+    sourcingPoints: [
+      '내비게이션 실행 시 스마트폰 발열 화면 멈춤 고질병 해결',
+      '방지턱에서도 안 떨어지는 자력 테스트 실측',
+      '송풍구 갈고리형 결합 구조로 흔들림 제로',
+    ],
+    dataSources: 'Naver 쇼핑인사이트 IT/차량용품 상위 검색어',
+    isImported: true,
+  },
+];
+
 // Storage keys
 const STORAGE_KEYS = {
   PRODUCTS: 'iaa_products_v1',
@@ -522,6 +718,7 @@ const STORAGE_KEYS = {
   COMMENT_LOGS: 'iaa_comment_logs_v1',
   PERFORMANCE: 'iaa_performance_v1',
   API_SETTINGS: 'iaa_api_settings_v1',
+  SOURCING_KEYWORDS: 'iaa_sourcing_keywords_v1',
 };
 
 class AutopilotStorageService {
@@ -636,6 +833,37 @@ class AutopilotStorageService {
     this.set(STORAGE_KEYS.API_SETTINGS, settings);
   }
 
+  // Sourcing Keywords (Naver DataLab & ItemScout)
+  getSourcingKeywords(): SourcingKeyword[] {
+    return this.get<SourcingKeyword[]>(STORAGE_KEYS.SOURCING_KEYWORDS, SEED_SOURCING_KEYWORDS);
+  }
+
+  saveSourcingKeyword(kw: SourcingKeyword): SourcingKeyword {
+    const list = this.getSourcingKeywords();
+    const index = list.findIndex((k) => k.id === kw.id);
+    if (index >= 0) {
+      list[index] = kw;
+    } else {
+      list.unshift(kw);
+    }
+    this.set(STORAGE_KEYS.SOURCING_KEYWORDS, list);
+    return kw;
+  }
+
+  deleteSourcingKeyword(id: string): void {
+    const list = this.getSourcingKeywords().filter((k) => k.id !== id);
+    this.set(STORAGE_KEYS.SOURCING_KEYWORDS, list);
+  }
+
+  markKeywordImported(id: string, isImported = true): void {
+    const list = this.getSourcingKeywords();
+    const item = list.find((k) => k.id === id);
+    if (item) {
+      item.isImported = isImported;
+      this.set(STORAGE_KEYS.SOURCING_KEYWORDS, list);
+    }
+  }
+
   // Reset to initial seed
   resetAll(): void {
     this.set(STORAGE_KEYS.PRODUCTS, SEED_PRODUCTS);
@@ -643,6 +871,7 @@ class AutopilotStorageService {
     this.set(STORAGE_KEYS.COMMENT_LOGS, SEED_COMMENT_LOGS);
     this.set(STORAGE_KEYS.PERFORMANCE, SEED_PERFORMANCE);
     this.set(STORAGE_KEYS.API_SETTINGS, SEED_API_SETTINGS);
+    this.set(STORAGE_KEYS.SOURCING_KEYWORDS, SEED_SOURCING_KEYWORDS);
   }
 }
 

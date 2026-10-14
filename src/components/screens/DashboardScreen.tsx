@@ -78,15 +78,21 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
 
             <div className="flex items-center gap-2 shrink-0">
               <button
-                onClick={() => onNavigate('register')}
-                className="px-4 py-2 bg-sky-500 hover:bg-sky-400 text-slate-950 font-semibold text-xs rounded-lg transition-colors flex items-center gap-1.5"
+                onClick={() => onNavigate('sourcing')}
+                className="px-4 py-2 bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold text-xs rounded-lg transition-colors flex items-center gap-1.5 shadow-sm"
               >
-                <span>새 상품 후보 등록</span>
+                <span>키워드 발굴 (DataLab)</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
               <button
+                onClick={() => onNavigate('register')}
+                className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-white font-medium text-xs rounded-lg border border-slate-700 transition-colors"
+              >
+                상품 직접 등록
+              </button>
+              <button
                 onClick={() => onNavigate('review')}
-                className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white font-medium text-xs rounded-lg border border-slate-700 transition-colors"
+                className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-white font-medium text-xs rounded-lg border border-slate-700 transition-colors"
               >
                 검수 대기함 ({reviewRequiredPosts.length})
               </button>
@@ -94,14 +100,15 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
           </div>
 
           {/* Workflow Stepper */}
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2 mt-6 pt-5 border-t border-slate-800 text-xs">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-9 gap-2 mt-6 pt-5 border-t border-slate-800 text-xs">
             {[
-              { step: '01', name: '상품 등록', count: totalProducts, screen: 'products' },
+              { step: '00', name: '키워드 발굴', count: 'DataLab/ItemScout', screen: 'sourcing', highlight: true },
+              { step: '01', name: '상품 등록', count: `${totalProducts}개 등록`, screen: 'products' },
               { step: '02', name: '가중치 평가', count: `${gradeCount.S + gradeCount.A}개 우수`, screen: 'products' },
-              { step: '03', name: '캐러셀 기획', count: posts.length, screen: 'carousel' },
+              { step: '03', name: '캐러셀 기획', count: `${posts.length}건 기획`, screen: 'carousel' },
               { step: '04', name: '캡션/태그', count: 'FTC준수', screen: 'caption' },
               { step: '05', name: '검수 심사', count: `${reviewRequiredPosts.length}건 대기`, screen: 'review', highlight: reviewRequiredPosts.length > 0 },
-              { step: '06', name: '게시 예약', count: scheduledPosts.length, screen: 'schedule' },
+              { step: '06', name: '게시 예약', count: `${scheduledPosts.length}건`, screen: 'schedule' },
               { step: '07', name: '댓글 자동 DM', count: `${totalDmSent}건 발송`, screen: 'comment-dm' },
               { step: '08', name: '실적 분석', count: `${totalCommission.toLocaleString()}원`, screen: 'analytics' },
             ].map((st, i) => (

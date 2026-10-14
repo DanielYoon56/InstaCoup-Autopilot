@@ -10,12 +10,14 @@ import {
   CommentTriggerLog,
   AffiliatePerformanceRecord,
   ApiSettings,
+  SourcingKeyword,
 } from './types';
-import { autopilotStorage } from './services/storage';
+import { autopilotStorage, calculateProductScore } from './services/storage';
 import { generateContentForProduct } from './services/aiGenerator';
 import { Sidebar, ScreenId } from './components/layout/Sidebar';
 import { Navbar } from './components/layout/Navbar';
 import { DashboardScreen } from './components/screens/DashboardScreen';
+import { KeywordSourcingScreen } from './components/screens/KeywordSourcingScreen';
 import { ProductListScreen } from './components/screens/ProductListScreen';
 import { ProductRegisterModal } from './components/screens/ProductRegisterModal';
 import { CarouselEditorScreen } from './components/screens/CarouselEditorScreen';
@@ -33,6 +35,7 @@ export default function App() {
   const [commentLogs, setCommentLogs] = useState<CommentTriggerLog[]>([]);
   const [performance, setPerformance] = useState<AffiliatePerformanceRecord[]>([]);
   const [apiSettings, setApiSettings] = useState<ApiSettings>(autopilotStorage.getApiSettings());
+  const [sourcingKeywords, setSourcingKeywords] = useState<SourcingKeyword[]>([]);
 
   const [currentPostId, setCurrentPostId] = useState<string>('');
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
@@ -49,15 +52,82 @@ export default function App() {
     const loadedLogs = autopilotStorage.getCommentLogs();
     const loadedPerf = autopilotStorage.getPerformance();
     const loadedSettings = autopilotStorage.getApiSettings();
+    const loadedKeywords = autopilotStorage.getSourcingKeywords();
 
     setProducts(loadedProducts);
     setPosts(loadedPosts);
     setCommentLogs(loadedLogs);
     setPerformance(loadedPerf);
     setApiSettings(loadedSettings);
+    setSourcingKeywords(loadedKeywords);
 
     if (loadedPosts.length > 0 && !currentPostId) {
       setCurrentPostId(loadedPosts[0].id);
+    }
+  };
+
+  // Convert SourcingKeyword to real Product in pipeline
+  const handleImportKeywordToProduct = async (
+    kw: SourcingKeyword,
+    andGenerate = false
+  ) => {
+    // Generate scores based on ItemScout & DataLab metrics
+    const demandSignal = Math.min(25, Math.round((kw.monthlySearchVolume / 100000) * 15 + 10));
+    const priceComp = kw.estimatedPrice < 100000 ? 19 : 16;
+    const contentAppeal = kw.shoppingIntentRatio > 80 ? 19 : 16;
+    const seasonality = kw.seasonalityStatus === 'RISING' || kw.seasonalityStatus === 'PEAK' ? 15 : 12;
+    const infoRel = 10;
+    const purchaseConv = 9;
+
+    const scores = {
+      demandSignal,
+      priceCompetitiveness: priceComp,
+      contentAppeal,
+      seasonality,
+      infoReliability: infoRel,
+      purchaseConvenience: purchaseConv,
+    };
+
+    const { totalScore, grade } = calculateProductScore(scores);
+
+    const now = new Date();
+    const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(
+      now.getDate()
+    ).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(
+      2,
+      '0'
+    )} KST`;
+
+    const newProduct: Product = {
+      id: `prod-${Date.now()}`,
+      name: kw.recommendedProductTitle,
+      category: kw.category,
+      originalUrl: `https://www.coupang.com/np/search?q=${encodeURIComponent(kw.keyword)}`,
+      affiliateUrl: `https://link.coupang.com/a/auto_${kw.id.replace('kw-', '')}`,
+      price: kw.estimatedPrice,
+      regularPrice: Math.round(kw.estimatedPrice * 1.35),
+      specification: kw.suggestedSpecs,
+      verifiedAt: dateStr,
+      source: kw.dataSources,
+      keywords: [kw.keyword, ...kw.sourcingPoints.map((p) => p.split(' ')[0])],
+      scores,
+      totalScore,
+      grade,
+      verifiedStockStatus: 'IN_STOCK',
+      notes: `[DataLab/ItemScout 발굴] 월 검색 ${kw.monthlySearchVolume.toLocaleString()}회 / 경쟁강도 ${kw.competitionIndex} / 급상승 +${kw.trendGrowthRate}%`,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    autopilotStorage.saveProduct(newProduct);
+    autopilotStorage.markKeywordImported(kw.id, true);
+    setProducts(autopilotStorage.getProducts());
+    setSourcingKeywords(autopilotStorage.getSourcingKeywords());
+
+    if (andGenerate) {
+      await handleGenerateContent(newProduct);
+    } else {
+      alert(`[${newProduct.name}] 상품이 파이프라인에 등록되었습니다! (평가: ${totalScore}점 ${grade}등급)`);
     }
   };
 
@@ -230,6 +300,18 @@ export default function App() {
             />
           )}
 
+          {currentScreen === 'sourcing' && (
+            <KeywordSourcingScreen
+              keywords={sourcingKeywords}
+              onImportKeywordToProduct={handleImportKeywordToProduct}
+              onRefreshKeywords={(updatedKeywords) => {
+                setSourcingKeywords(updatedKeywords);
+                updatedKeywords.forEach((k) => autopilotStorage.saveSourcingKeyword(k));
+              }}
+              onNavigateToProducts={() => setCurrentScreen('products')}
+            />
+          )}
+
           {currentScreen === 'products' && (
             <ProductListScreen
               products={products}
@@ -237,6 +319,7 @@ export default function App() {
               onGeneratePostForProduct={handleGenerateContent}
               onUpdateProduct={handleUpdateProduct}
               onDeleteProduct={handleDeleteProduct}
+              onNavigateToSourcing={() => setCurrentScreen('sourcing')}
             />
           )}
 

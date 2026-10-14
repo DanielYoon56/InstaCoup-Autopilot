@@ -45,6 +45,30 @@ export interface Product {
   updatedAt: string;
 }
 
+export type CompetitionStatus = 'BLUE_OCEAN' | 'NORMAL' | 'RED_OCEAN';
+export type SeasonalityStatus = 'RISING' | 'PEAK' | 'STEADY' | 'DECLINING';
+
+export interface SourcingKeyword {
+  id: string;
+  keyword: string; // 핵심 검색 키워드
+  category: ProductCategory; // 카테고리
+  monthlySearchVolume: number; // 월간 검색수 (PC + MO)
+  mobileSearchRatio: number; // 모바일 검색 비중 (%)
+  productCount: number; // 네이버/쿠팡 등록 상품수
+  competitionIndex: number; // 경쟁 강도 (상품수 / 검색수)
+  competitionStatus: CompetitionStatus; // 블루오션 / 보통 / 레드오션
+  trendGrowthRate: number; // 전월 대비 검색 증가율 (%)
+  seasonalityStatus: SeasonalityStatus; // 급상승 / 성수기 피크 / 안정 / 비수기
+  shoppingIntentRatio: number; // 쇼핑성 검색 의도 비율 (%)
+  recommendedProductTitle: string; // 발굴된 추천 상품 후보명
+  estimatedPrice: number; // 적정 타겟 가격대 (원)
+  estimatedCommissionRate: number; // 쿠팡 파트너스 예상 수수료율 (%)
+  suggestedSpecs: string; // 확인된 핵심 스펙 가이드
+  sourcingPoints: string[]; // 인스타그램 캐러셀 소구 포인트
+  dataSources: string; // 데이터 출처 (네이버 데이터랩, 아이템스카우트 등)
+  isImported?: boolean; // 파이프라인 등록 여부
+}
+
 export type SlideType =
   | 'HOOK' // 1. 관심을 끄는 첫 장
   | 'CRITERIA' // 2. 상품 선택 기준

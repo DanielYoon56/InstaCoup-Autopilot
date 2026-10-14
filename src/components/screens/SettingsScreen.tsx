@@ -28,6 +28,60 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
   const [formData, setFormData] = useState<ApiSettings>(settings);
   const [savedToast, setSavedToast] = useState(false);
   const [copiedWebhook, setCopiedWebhook] = useState(false);
+  const [copiedWebhookIg, setCopiedWebhookIg] = useState(false);
+  const [copiedVerifyToken, setCopiedVerifyToken] = useState(false);
+
+  // Meta Developer Token Verification State
+  const [metaTokenInput, setMetaTokenInput] = useState('');
+  const [isVerifyingToken, setIsVerifyingToken] = useState(false);
+  const [tokenResult, setTokenResult] = useState<{ valid: boolean; message: string } | null>(null);
+  const [showGuideModal, setShowGuideModal] = useState(false);
+
+  const igWebhookUrl = `${window.location.origin}/api/webhooks/instagram`;
+  const igVerifyToken = 'autopilot_secret_verify_token';
+
+  const handleVerifyMetaToken = async () => {
+    if (!metaTokenInput.trim()) {
+      alert('발급받은 Meta 액세스 토큰을 입력해주세요.');
+      return;
+    }
+    setIsVerifyingToken(true);
+    setTokenResult(null);
+
+    try {
+      const res = await fetch('/api/settings/verify-instagram-token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ accessToken: metaTokenInput.trim() }),
+      });
+      const data = await res.json();
+      setTokenResult(data);
+
+      if (data.valid) {
+        setFormData((prev) => ({
+          ...prev,
+          instagram: {
+            ...prev.instagram,
+            isConnected: true,
+            isDemo: false,
+            accountUsername: data.accountName || prev.instagram.accountUsername,
+            accountId: data.accountId || prev.instagram.accountId,
+            permissions: {
+              pages_show_list: true,
+              instagram_basic: true,
+              instagram_content_publish: true,
+              instagram_manage_comments: true,
+              instagram_manage_messages: true,
+            },
+          },
+        }));
+      }
+    } catch (err: any) {
+      setTokenResult({ valid: false, message: `통신 오류: ${err.message}` });
+    } finally {
+      setIsVerifyingToken(false);
+    }
+  };
 
   const handleToggleInstagramConnection = (connected: boolean) => {
     setFormData((prev) => ({
@@ -61,6 +115,18 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
     navigator.clipboard.writeText(formData.manychat.webhookUrl);
     setCopiedWebhook(true);
     setTimeout(() => setCopiedWebhook(false), 2000);
+  };
+
+  const handleCopyIgWebhook = () => {
+    navigator.clipboard.writeText(igWebhookUrl);
+    setCopiedWebhookIg(true);
+    setTimeout(() => setCopiedWebhookIg(false), 2000);
+  };
+
+  const handleCopyVerifyToken = () => {
+    navigator.clipboard.writeText(igVerifyToken);
+    setCopiedVerifyToken(true);
+    setTimeout(() => setCopiedVerifyToken(false), 2000);
   };
 
   return (
@@ -161,6 +227,107 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
               </div>
             </div>
 
+            {/* Meta Access Token Input & Test Verification */}
+            <div className="pt-2 border-t border-slate-100 space-y-2">
+              <div className="flex items-center justify-between">
+                <label className="block font-semibold text-slate-800">
+                  Meta 액세스 토큰 (User/Page Access Token)
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setShowGuideModal(true)}
+                  className="text-sky-600 hover:text-sky-700 font-semibold text-[11px] flex items-center gap-1"
+                >
+                  <Globe className="w-3 h-3" />
+                  <span>5단계 무료 토큰 발급 가이드</span>
+                </button>
+              </div>
+
+              <div className="flex gap-2">
+                <input
+                  type="password"
+                  placeholder="EAAB... (Graph API 탐색기에서 발급받은 토큰 붙여넣기)"
+                  value={metaTokenInput}
+                  onChange={(e) => setMetaTokenInput(e.target.value)}
+                  className="flex-1 px-3 py-2 border border-slate-200 rounded-lg font-mono text-[11px] focus:outline-none focus:ring-2 focus:ring-sky-500/20"
+                />
+                <button
+                  type="button"
+                  onClick={handleVerifyMetaToken}
+                  disabled={isVerifyingToken}
+                  className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs rounded-lg transition-colors flex items-center gap-1.5 shrink-0 shadow-xs disabled:opacity-50"
+                >
+                  <Key className="w-3.5 h-3.5" />
+                  <span>{isVerifyingToken ? '검증 중...' : '토큰 검증'}</span>
+                </button>
+              </div>
+
+              {tokenResult && (
+                <div
+                  className={`p-2.5 rounded-lg text-xs leading-relaxed flex items-start gap-2 ${
+                    tokenResult.valid
+                      ? 'bg-emerald-50 border border-emerald-200 text-emerald-900'
+                      : 'bg-rose-50 border border-rose-200 text-rose-900'
+                  }`}
+                >
+                  {tokenResult.valid ? (
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                  ) : (
+                    <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+                  )}
+                  <div>
+                    <div className="font-bold">
+                      {tokenResult.valid ? '연결 성공' : '인증 실패'}
+                    </div>
+                    <div className="text-[11px] mt-0.5">{tokenResult.message}</div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Webhook Callback & Verify Token info for Meta App */}
+            <div className="pt-2 border-t border-slate-100 space-y-2">
+              <label className="block font-semibold text-slate-800">
+                메타 개발자 센터 Webhook 등록 정보
+              </label>
+              
+              <div className="space-y-1.5">
+                <div className="flex items-center gap-2">
+                  <span className="text-slate-500 w-20 shrink-0 text-[11px]">콜백 URL:</span>
+                  <input
+                    type="text"
+                    readOnly
+                    value={igWebhookUrl}
+                    className="flex-1 px-2.5 py-1.5 border border-slate-200 rounded bg-slate-50 font-mono text-[10px] text-slate-700"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleCopyIgWebhook}
+                    className="px-2 py-1 text-[11px] bg-slate-100 hover:bg-slate-200 rounded border border-slate-200 text-slate-700"
+                  >
+                    {copiedWebhookIg ? '복사됨' : '복사'}
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="text-slate-500 w-20 shrink-0 text-[11px]">확인 토큰:</span>
+                  <input
+                    type="text"
+                    readOnly
+                    value={igVerifyToken}
+                    className="flex-1 px-2.5 py-1.5 border border-slate-200 rounded bg-slate-50 font-mono text-[10px] text-slate-700"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleCopyVerifyToken}
+                    className="px-2 py-1 text-[11px] bg-slate-100 hover:bg-slate-200 rounded border border-slate-200 text-slate-700"
+                  >
+                    {copiedVerifyToken ? '복사됨' : '복사'}
+                  </button>
+                </div>
+              </div>
+            </div>
+
             {/* Permissions list */}
             <div>
               <label className="block font-semibold text-slate-700 mb-1.5">
@@ -182,7 +349,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
                 ))}
               </div>
               <p className="text-[10px] text-slate-400 mt-1">
-                ※ instagram_content_publish 권한이 없는 경우 공식 정책에 따라 "연결 완료"로 간주되지 않습니다.
+                ※ instagram_manage_messages 및 comments 권한이 활성화되면 인스타그램 댓글에 대한 0원 무료 Private Reply 자동 DM이 실시간 작동합니다.
               </p>
             </div>
           </div>
@@ -289,19 +456,22 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
           </div>
         </div>
 
-        {/* 3. Manychat Adapter */}
+        {/* 3. Manychat Adapter & Cost Transparency */}
         <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-xs">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-            <h3 className="text-sm font-bold text-slate-900">Manychat 선택형 웹훅 어댑터</h3>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200">
-              DEMO 상태
+            <div>
+              <h3 className="text-sm font-bold text-slate-900">Manychat 연동 및 요금제 안내</h3>
+              <div className="text-[11px] text-slate-500">External Request 웹훅 연동 규격</div>
+            </div>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-sky-50 text-sky-800 border border-sky-200">
+              어댑터 준비완료
             </span>
           </div>
 
           <div className="space-y-3 text-xs">
             <div>
               <label className="block font-semibold text-slate-700 mb-1">
-                수신 웹훅 엔드포인트 URL
+                Manychat용 실시간 수신 웹훅 URL
               </label>
               <div className="flex gap-2">
                 <input
@@ -320,9 +490,23 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
               </div>
             </div>
 
-            <p className="text-[11px] text-slate-500 leading-relaxed">
-              Manychat Instagram Automation 템플릿의 외부 웹훅 액션에 위 엔드포인트를 등록하면, 댓글 이벤트 발생 시 본 시스템의 24시간 쿨다운 엔진 및 올바른 쿠팡 트래킹 링크가 즉시 응답됩니다.
-            </p>
+            {/* Manychat Fee & Free Alternatives Guide */}
+            <div className="p-3 bg-amber-50/70 border border-amber-200 rounded-xl space-y-1.5 text-[11px] text-amber-900">
+              <div className="font-bold text-amber-950 flex items-center gap-1">
+                <span>⚠️ Manychat 유료 가입 필요 여부:</span>
+              </div>
+              <ul className="list-disc list-inside space-y-1 text-slate-700">
+                <li>
+                  <strong>동적 웹훅 실시간 연동 시:</strong> Manychat의 'External Request(외부 웹훅)' 블록은 <strong>Manychat Pro (월 $15~)</strong> 플랜에서만 지원됩니다.
+                </li>
+                <li>
+                  <strong>100% 완전 무료(비용 0원) 대안:</strong> 좌측의 <strong>[Meta 공식 Graph API 직접 발송]</strong>을 사용하시면 Manychat 결제 없이 메타 무료 공식 API로 0원에 직접 발송할 수 있습니다.
+                </li>
+                <li>
+                  <strong>Manychat 무료 플랜(1,000명 이하) 팁:</strong> 외부 웹훅 대신 Manychat 무료 플랜 내에서 내 고정 프로필 링크트리(Linktree) 링크를 전송하는 정적 플로우로 세팅하면 0원으로 운영 가능합니다.
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
 
@@ -387,6 +571,144 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Meta Developer 5-Step Guide Modal */}
+      {showGuideModal && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl space-y-5 border border-slate-200 my-8">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div>
+                <span className="text-[11px] font-bold text-sky-600">비용 0원 완전 무료 연동 가이드</span>
+                <h3 className="text-base font-bold text-slate-900 mt-0.5">
+                  메타 개발자 센터(developers.facebook.com) 5단계 무료 앱 생성 & 토큰 발급
+                </h3>
+              </div>
+              <button
+                onClick={() => setShowGuideModal(false)}
+                className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 text-lg font-bold"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="space-y-4 text-xs text-slate-700 max-h-[70vh] overflow-y-auto pr-2 leading-relaxed">
+              {/* Pre-requisite */}
+              <div className="p-3.5 bg-sky-50/70 border border-sky-200 rounded-xl space-y-1">
+                <div className="font-bold text-sky-950">📌 시작 전 필수 준비 (2분 소요)</div>
+                <div className="text-[11px] text-sky-900/90">
+                  1. 인스타그램 앱 ➔ [설정] ➔ [계정 유형] ➔ <strong>'프로페셔널 계정 (크리에이터 또는 비즈니스)'</strong>으로 전환 (개인 계정은 메타 API 지원 불가)<br />
+                  2. 페이스북 앱/웹에서 비즈니스용 <strong>페이스북 페이지(Page) 1개 생성</strong> 후 인스타그램 계정과 연결
+                </div>
+              </div>
+
+              {/* Step 1 */}
+              <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
+                <div className="font-bold text-slate-900 flex items-center gap-1.5">
+                  <span className="w-5 h-5 rounded-full bg-slate-800 text-white flex items-center justify-center text-[10px]">1</span>
+                  <span>메타 개발자 센터 접속 및 무료 앱 생성</span>
+                </div>
+                <div className="text-[11px] text-slate-600 pl-6 space-y-1">
+                  <div>1. <a href="https://developers.facebook.com" target="_blank" rel="noreferrer" className="text-sky-600 underline font-semibold">developers.facebook.com</a> 접속 후 기존 페이스북 계정으로 로그인</div>
+                  <div>2. 우측 상단 <strong>[내 앱 (My Apps)]</strong> ➔ <strong>[앱 만들기 (Create App)]</strong> 클릭</div>
+                  <div>3. 앱 사용 사례: <strong>'다른 기능 (Other)'</strong> ➔ 앱 유형: <strong>'비즈니스 (Business)'</strong> 선택</div>
+                  <div>4. 앱 이름(예: <code>IG_Affiliate_Bot</code>) 및 연락처 이메일 입력 후 생성 완료</div>
+                </div>
+              </div>
+
+              {/* Step 2 */}
+              <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
+                <div className="font-bold text-slate-900 flex items-center gap-1.5">
+                  <span className="w-5 h-5 rounded-full bg-slate-800 text-white flex items-center justify-center text-[10px]">2</span>
+                  <span>제품 추가 (Instagram Graph API & Webhooks)</span>
+                </div>
+                <div className="text-[11px] text-slate-600 pl-6 space-y-1">
+                  <div>대시보드 좌측 메뉴 [제품 추가]에서 아래 2개 제품의 <strong>[설정]</strong>을 클릭합니다:</div>
+                  <div>• <strong>Instagram Graph API</strong> (인스타그램 비즈니스 연동용)</div>
+                  <div>• <strong>Webhooks</strong> (실시간 댓글 감지용)</div>
+                </div>
+              </div>
+
+              {/* Step 3 */}
+              <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+                <div className="font-bold text-slate-900 flex items-center gap-1.5">
+                  <span className="w-5 h-5 rounded-full bg-slate-800 text-white flex items-center justify-center text-[10px]">3</span>
+                  <span>Webhooks(웹훅) 콜백 URL 등록 (댓글 실시간 수신)</span>
+                </div>
+                <div className="text-[11px] text-slate-600 pl-6 space-y-2">
+                  <div>개발자 센터 좌측 메뉴 <strong>[Webhooks]</strong> ➔ 드롭다운에서 <strong>[Instagram]</strong> 선택 후 <strong>[이 개체 구독]</strong> 클릭:</div>
+                  
+                  <div className="p-2.5 bg-white border border-slate-200 rounded-lg space-y-2 font-mono text-[11px]">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-slate-500">콜백 URL:</span>
+                      <span className="text-slate-800 font-semibold truncate flex-1">{igWebhookUrl}</span>
+                      <button
+                        onClick={handleCopyIgWebhook}
+                        className="px-2 py-0.5 bg-slate-800 text-white rounded text-[10px] shrink-0"
+                      >
+                        {copiedWebhookIg ? '복사됨' : '복사'}
+                      </button>
+                    </div>
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-slate-500">확인 토큰:</span>
+                      <span className="text-slate-800 font-semibold truncate flex-1">{igVerifyToken}</span>
+                      <button
+                        onClick={handleCopyVerifyToken}
+                        className="px-2 py-0.5 bg-slate-800 text-white rounded text-[10px] shrink-0"
+                      >
+                        {copiedVerifyToken ? '복사됨' : '복사'}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>[확인 및 저장]을 누르면 우리 서버가 즉시 200 응답하여 통과됩니다. 그 후 목록에서 <strong>comments(댓글)</strong> 필드의 [구독]을 체크하세요.</div>
+                </div>
+              </div>
+
+              {/* Step 4 */}
+              <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
+                <div className="font-bold text-slate-900 flex items-center gap-1.5">
+                  <span className="w-5 h-5 rounded-full bg-slate-800 text-white flex items-center justify-center text-[10px]">4</span>
+                  <span>Graph API 탐색기에서 무료 토큰 발급</span>
+                </div>
+                <div className="text-[11px] text-slate-600 pl-6 space-y-1">
+                  <div>1. 상단 메뉴 <strong>[도구]</strong> ➔ <strong>[Graph API 탐색기 (Graph API Explorer)]</strong> 클릭</div>
+                  <div>2. Meta 앱: 방금 생성한 앱 선택</div>
+                  <div>3. 사용자 또는 페이지: <strong>내 인스타그램과 연동된 '페이지 액세스 토큰'</strong> 선택</div>
+                  <div>4. <strong>[권한 추가 (Add Permissions)]</strong>에서 아래 4대 필수 권한 체크:</div>
+                  <div className="p-2 bg-white rounded border border-slate-200 font-mono text-[10px] text-sky-800">
+                    • instagram_basic<br />
+                    • instagram_manage_comments (댓글 감지)<br />
+                    • instagram_manage_messages (비공개 답장 DM 전송)<br />
+                    • pages_show_list, pages_read_engagement
+                  </div>
+                  <div>5. <strong>[Generate Access Token]</strong> 버튼 클릭 ➔ 페이스북 계정 권한 승인 팝업 통과</div>
+                </div>
+              </div>
+
+              {/* Step 5 */}
+              <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
+                <div className="font-bold text-slate-900 flex items-center gap-1.5">
+                  <span className="w-5 h-5 rounded-full bg-slate-800 text-white flex items-center justify-center text-[10px]">5</span>
+                  <span>토큰 60일/영구 연장 & 본 시스템 등록</span>
+                </div>
+                <div className="text-[11px] text-slate-600 pl-6 space-y-1">
+                  <div>1. 발급된 임시 토큰을 [액세스 토큰 도구(Access Token Tool)]에서 <strong>[디버그] ➔ [액세스 토큰 연장(Extend Access Token)]</strong> 클릭하면 60일 또는 무기한 토큰으로 변환됩니다.</div>
+                  <div>2. 변환된 토큰 문자열(<code>EAAB...</code>)을 복사하여 아래 본 시스템의 <strong>[Meta 액세스 토큰]</strong> 입력란에 붙여넣고 <strong>[토큰 검증]</strong>을 누르면 비용 0원 무료 자동 DM 시스템이 영구 가동됩니다!</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end pt-3 border-t border-slate-100">
+              <button
+                onClick={() => setShowGuideModal(false)}
+                className="px-4 py-2 bg-slate-900 text-white font-semibold text-xs rounded-lg hover:bg-slate-800 transition-colors"
+              >
+                확인 및 닫기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
